@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Para meu amor 💕</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+:root {
+  --pink:#f4a0c0; --pink-deep:#d4608a;
+  --lilac:#c9a7f5; --lilac-deep:#9b6fd4;
+  --gold:#f7d794; --white:#fdf0f8;
+  --bg:#07000d; --glass:rgba(255,255,255,0.04);
+  --glass-b:rgba(255,255,255,0.10);
+}
+body { background:var(--bg); color:var(--white); font-family:'Jost',sans-serif; font-weight:300; overflow-x:hidden; }
+
+/* STARFIELD */
+#starfield { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+/* MUSIC PLAYER */
+#music-player {
+  position:fixed; bottom:1.5rem; right:1.5rem; z-index:1000;
+  display:flex; align-items:center; gap:.75rem;
+  background:rgba(15,4,32,0.88); border:1px solid var(--glass-b);
+  border-radius:60px; padding:.6rem 1.2rem .6rem .6rem;
+  backdrop-filter:blur(16px);
+  box-shadow:0 0 30px rgba(201,167,245,0.15);
+  transition:transform .3s ease, opacity .3s ease;
+}
+#play-btn {
+  width:40px; height:40px; border-radius:50%;
+  background:linear-gradient(135deg,var(--pink),var(--lilac));
+  border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:transform .2s;
+}
+#play-btn:hover { transform:scale(1.1); }
+#play-btn svg { width:16px; height:16px; fill:white; }
+.music-title { font-size:.72rem; font-weight:400; color:var(--white); white-space:nowrap; max-width:120px; overflow:hidden; text-overflow:ellipsis; display:block; }
+.music-sub   { font-size:.65rem; color:rgba(253,240,248,.4); display:block; }
+.music-eq { display:flex; align-items:flex-end; gap:2px; height:16px; }
+.music-eq span { width:3px; border-radius:2px; background:linear-gradient(to top,var(--pink),var(--lilac)); animation:eq .8s ease-in-out infinite alternate; }
+.music-eq span:nth-child(1){height:8px; animation-delay:0s}
+.music-eq span:nth-child(2){height:14px;animation-delay:.15s}
+.music-eq span:nth-child(3){height:6px; animation-delay:.3s}
+.music-eq span:nth-child(4){height:12px;animation-delay:.1s}
+.music-eq.paused span { animation-play-state:paused; opacity:.3; }
+@keyframes eq { from{transform:scaleY(.4)} to{transform:scaleY(1)} }
+
+/* LAYOUT */
+section { position:relative; z-index:1; }
+.container { max-width:860px; margin:0 auto; padding:0 2rem; }
+.container-wide { max-width:1060px; margin:0 auto; padding:0 2rem; }
+.orb { position:absolute; border-radius:50%; pointer-events:none; filter:blur(90px); opacity:.10; z-index:0; }
+
+/* HERO */
+.hero { min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:4rem 2rem; overflow:hidden; }
+.hero-inner { max-width:700px; }
+.hero-eyebrow { font-size:clamp(.7rem,1.8vw,.85rem); letter-spacing:.38em; text-transform:uppercase; color:var(--pink); font-weight:200; opacity:0; animation:fadeUp 1s .3s forwards; }
+.hero-title { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:clamp(3.2rem,9vw,6.5rem); line-height:1.05; margin:1rem 0 .5rem; opacity:0; animation:fadeUp 1s .6s forwards; }
+.hero-title em { font-style:italic; background:linear-gradient(135deg,var(--pink),var(--lilac),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.hero-subtitle { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(1rem,2.8vw,1.4rem); color:rgba(253,240,248,.5); margin-top:1.5rem; line-height:1.8; opacity:0; animation:fadeUp 1s .9s forwards; }
+.scroll-hint { margin-top:3.5rem; display:flex; flex-direction:column; align-items:center; gap:.5rem; opacity:0; animation:fadeUp 1s 1.4s forwards; color:rgba(253,240,248,.25); font-size:.65rem; letter-spacing:.25em; text-transform:uppercase; }
+.scroll-line { width:1px; height:50px; background:linear-gradient(to bottom,transparent,var(--pink)); animation:pulseOp 2s ease-in-out infinite; }
+
+/* COUNTER */
+.counter-section { padding:4rem 2rem 5rem; text-align:center; }
+.counter-label { font-size:.7rem; letter-spacing:.4em; text-transform:uppercase; color:var(--lilac); margin-bottom:2.5rem; opacity:.7; }
+.counter-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; }
+.counter-box { background:var(--glass); border:1px solid var(--glass-b); border-radius:16px; padding:1.5rem 1.75rem 1.25rem; min-width:100px; position:relative; overflow:hidden; }
+.counter-box::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(244,160,192,.06),rgba(201,167,245,.06)); pointer-events:none; }
+.counter-num { font-family:'Cormorant Garamond',serif; font-size:clamp(2.5rem,6vw,4rem); font-weight:300; line-height:1; background:linear-gradient(135deg,var(--pink),var(--lilac)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:block; min-width:4ch; }
+.counter-box:nth-child(2) .counter-num { background:linear-gradient(135deg,var(--lilac),var(--gold)); -webkit-background-clip:text; background-clip:text; }
+.counter-box:nth-child(3) .counter-num { background:linear-gradient(135deg,var(--gold),var(--pink)); -webkit-background-clip:text; background-clip:text; }
+.counter-box:nth-child(4) .counter-num { background:linear-gradient(135deg,var(--pink),var(--gold)); -webkit-background-clip:text; background-clip:text; }
+.counter-unit { font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(253,240,248,.35); margin-top:.5rem; display:block; }
+.counter-since { margin-top:2rem; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1rem; color:rgba(253,240,248,.3); }
+
+/* SECTION HELPERS */
+.sec-label { font-size:.68rem; letter-spacing:.4em; text-transform:uppercase; color:var(--pink); text-align:center; margin-bottom:.75rem; }
+.sec-title { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:clamp(1.8rem,4.5vw,3rem); text-align:center; line-height:1.2; margin-bottom:3rem; }
+.sec-title em { font-style:italic; color:var(--lilac); }
+
+/* HEART */
+.heart-section { padding:3rem 2rem 5rem; display:flex; flex-direction:column; align-items:center; }
+#heartCanvas { width:280px; height:280px; cursor:crosshair; }
+.heart-btn { margin-top:2rem; padding:.9rem 2.5rem; background:linear-gradient(135deg,var(--pink-deep),var(--lilac-deep)); border:none; border-radius:60px; color:white; font-family:'Jost',sans-serif; font-size:.9rem; font-weight:300; letter-spacing:.1em; cursor:pointer; transition:transform .2s, box-shadow .2s; box-shadow:0 0 30px rgba(212,96,138,.3); }
+.heart-btn:hover { transform:scale(1.05); box-shadow:0 0 50px rgba(212,96,138,.5); }
+.heart-particle { position:fixed; pointer-events:none; animation:floatUp 3.5s linear forwards; z-index:999; }
+@keyframes floatUp { 0%{transform:translateY(0) scale(1) rotate(0deg);opacity:1} 100%{transform:translateY(-100vh) scale(.3) rotate(30deg);opacity:0} }
+
+/* VIDEO */
+.video-section { padding:4rem 2rem 6rem; }
+.video-frame { position:relative; border-radius:18px; overflow:hidden; aspect-ratio:16/9; border:1px solid var(--glass-b); box-shadow:0 0 60px rgba(201,167,245,.12),0 0 120px rgba(244,160,192,.06); }
+.video-frame::before { content:''; position:absolute; inset:-1px; border-radius:19px; background:linear-gradient(135deg,rgba(244,160,192,.25),rgba(201,167,245,.25)); z-index:-1; }
+.video-frame iframe { width:100%; height:100%; border:none; display:block; }
+
+/* TIMELINE */
+.timeline-section { padding:4rem 2rem 6rem; }
+.timeline { position:relative; max-width:700px; margin:0 auto; }
+.timeline::before { content:''; position:absolute; left:50%; top:0; bottom:0; width:1px; transform:translateX(-50%); background:linear-gradient(to bottom,transparent,var(--glass-b) 10%,var(--glass-b) 90%,transparent); }
+.tl-item { display:flex; align-items:flex-start; gap:2rem; margin-bottom:3.5rem; position:relative; }
+.tl-item:nth-child(even) { flex-direction:row-reverse; }
+.tl-dot { position:absolute; left:50%; top:1.25rem; transform:translate(-50%,-50%); width:12px; height:12px; border-radius:50%; background:linear-gradient(135deg,var(--pink),var(--lilac)); box-shadow:0 0 14px rgba(244,160,192,.6); z-index:2; flex-shrink:0; }
+.tl-card { flex:1; background:var(--glass); border:1px solid var(--glass-b); border-radius:14px; padding:1.5rem 1.75rem; transition:transform .3s, border-color .3s; max-width:calc(50% - 2rem); }
+.tl-card:hover { transform:translateY(-4px); border-color:rgba(201,167,245,.25); }
+.tl-date { font-size:.68rem; letter-spacing:.25em; text-transform:uppercase; color:var(--pink); margin-bottom:.6rem; }
+.tl-title { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:400; color:var(--white); margin-bottom:.5rem; line-height:1.3; }
+.tl-desc { font-size:.85rem; line-height:1.75; color:rgba(253,240,248,.45); }
+.tl-spacer { flex:1; max-width:calc(50% - 2rem); }
+@media(max-width:600px){
+  .timeline::before { left:0; }
+  .tl-item,.tl-item:nth-child(even) { flex-direction:column; padding-left:1.75rem; }
+  .tl-dot { left:0; }
+  .tl-card,.tl-spacer { max-width:100%; }
+  .tl-spacer { display:none; }
+}
+
+/* LETTER */
+.letter-section { padding:4rem 2rem 6rem; }
+.letter-card { background:var(--glass); border:1px solid var(--glass-b); border-radius:20px; padding:clamp(2rem,5vw,4rem); position:relative; overflow:hidden; }
+.letter-card::before { content:'\201C'; position:absolute; top:-.1em; left:.2em; font-family:'Cormorant Garamond',serif; font-size:16rem; color:rgba(244,160,192,.05); line-height:1; pointer-events:none; }
+.letter-body { font-family:'Cormorant Garamond',serif; font-size:clamp(1.05rem,2.4vw,1.35rem); line-height:2; color:rgba(253,240,248,.88); position:relative; }
+.letter-body p+p { margin-top:1.5em; }
+.letter-body em  { font-style:italic; color:var(--pink); }
+.letter-body strong { font-weight:400; color:var(--lilac); }
+.letter-sig { margin-top:3rem; text-align:right; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1.2rem; color:var(--gold); opacity:.75; }
+
+/* FOOTER */
+.footer { padding:5rem 2rem 6rem; text-align:center; }
+.footer-heart { display:inline-block; font-size:2.5rem; animation:heartbeat 1.5s ease-in-out infinite; margin-bottom:1.5rem; }
+.footer-text { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1rem; color:rgba(253,240,248,.25); }
+
+/* DIVIDER */
+.divider { width:1px; height:80px; background:linear-gradient(to bottom,transparent,rgba(201,167,245,.3),transparent); margin:0 auto; position:relative; z-index:1; }
+
+/* REVEAL */
+.reveal { opacity:0; transform:translateY(36px); transition:opacity .9s ease, transform .9s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* KEYFRAMES */
+@keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulseOp { 0%,100%{opacity:.25} 50%{opacity:1} }
+@keyframes heartbeat { 0%,100%{transform:scale(1)} 14%{transform:scale(1.18)} 28%{transform:scale(1)} 42%{transform:scale(1.1)} }
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<!-- MUSIC PLAYER -->
+<div id="music-player">
+  <button id="play-btn" aria-label="Tocar/Pausar">
+    <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <svg id="icon-pause" viewBox="0 0 24 24" style="display:none"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+  </button>
+  <div>
+    <span class="music-title">Nossa música ✨</span>
+    <span class="music-sub">pra você, Jess</span>
+  </div>
+  <div class="music-eq paused" id="eq-bars">
+    <span></span><span></span><span></span><span></span>
+  </div>
+</div>
+<audio id="bg-audio" loop src="musica.mp3"></audio>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="orb" style="width:600px;height:600px;background:var(--pink);top:-100px;right:-180px;"></div>
+  <div class="orb" style="width:500px;height:500px;background:var(--lilac);bottom:-50px;left:-150px;"></div>
+  <div class="hero-inner">
+    <p class="hero-eyebrow">✦ para a pessoa mais especial do universo ✦</p>
+    <h1 class="hero-title">Feliz<br><em>Aniversário,<br>meu amor</em></h1>
+    <p class="hero-subtitle">
+      Em um universo de bilhões de estrelas,<br>
+      eu tive a sorte de reencontrar a mais bonita de todas.
+    </p>
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      <span>continuar</span>
+    </div>
+  </div>
+</section>
+
+<!-- COUNTER -->
+<section class="counter-section">
+  <p class="counter-label">✦ juntinhos há ✦</p>
+  <div class="counter-grid reveal">
+    <div class="counter-box"><span class="counter-num" id="cnt-days">000</span><span class="counter-unit">dias</span></div>
+    <div class="counter-box"><span class="counter-num" id="cnt-hours">00</span><span class="counter-unit">horas</span></div>
+    <div class="counter-box"><span class="counter-num" id="cnt-mins">00</span><span class="counter-unit">minutos</span></div>
+    <div class="counter-box"><span class="counter-num" id="cnt-secs">00</span><span class="counter-unit">segundos</span></div>
+  </div>
+  <p class="counter-since">desde 12 de junho de 2025 às 16h53 ✦</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- HEART -->
+<section class="heart-section">
+  <p class="sec-label reveal">✦ o que eu sinto ✦</p>
+  <canvas id="heartCanvas" width="300" height="300"></canvas>
+  <button class="heart-btn" onclick="cairCoracoes()">Te amo, Jessica 💕</button>
+</section>
+
+<div class="divider"></div>
+
+<!-- VIDEO -->
+<section class="video-section">
+  <div class="container reveal">
+    <p class="sec-label">✦ eu fiz isso pra você ✦</p>
+    <h2 class="sec-title">Assista com <em>calma</em></h2>
+    <!--
+      TROCAR A URL:
+      YouTube → https://www.youtube.com/embed/watch?v=h8O9VQDawuI
+      Drive   → https://drive.google.com/file/d/1Zjze9FbNK1hKXhI8FktT4_3RghPXBCkk/preview
+    -->
+    <div class="video-frame">
+      <iframe src="https://www.youtube.com/embed/watch?v=h8O9VQDawuI"
+        title="Vídeo para Jessica"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TIMELINE -->
+<section class="timeline-section">
+  <div class="container-wide">
+    <div class="reveal">
+      <p class="sec-label">✦ nossa história ✦</p>
+      <h2 class="sec-title">Momentos que eu <em>nunca vou esquecer</em></h2>
+    </div>
+    <div class="timeline">
+
+      <div class="tl-item reveal">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <p class="tl-date">12 de junho de 2025</p>
+          <!--EDITAR OS TÍTULOS E DESCRIÇÕES ABAIXO-->
+          <h3 class="tl-title">O começo de tudo</h3>
+          <p class="tl-desc">Nunca vou esquecer o quanto eu tava tremendo quando te pedi em namoro, parecia que meu coração tinha virado um DJ maluco tocando só batidas aceleradas em uma musica NightCore. E aí, quando ouvi seu "sim", foi tipo ganhar na mega-sena, só consegui respirar de verdade quando finalmente dormimos juntos, e meu corpo percebeu que não era só o café que eu tinha tomado de manhã que tava me deixando nervoso o resto da tarde e a noite inteira.</p>
+        </div>
+        <div class="tl-spacer"></div>
+      </div>
+
+      <div class="tl-item reveal" style="transition-delay:.1s">
+        <div class="tl-dot"></div>
+        <div class="tl-spacer"></div>
+        <div class="tl-card">
+          <p class="tl-date">29 de maio de 2025</p>
+          <h3 class="tl-title">Segunda memória especial pra mim</h3>
+          <p class="tl-desc">Foi o dia em que a gente "saiu" pela primeira vez, mesmo que tenha sido no shopping perto da tua casa. Andar contigo sem rumo algum parecia uma missão impossível de filme já que tava chovendo muito, mas ao mesmo tempo foi um dos dias mais felizes da minha vida. Eu amei cada passo sem sentido, e cada risada boba sua... parecia que o mundo inteiro tinha feito uma leve pausa só pra gente se perder pelos corredores do shopping.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" style="transition-delay:.2s">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <p class="tl-date">26 de fevereiro de 2026</p>
+          <h3 class="tl-title">A terceira memória que eu tenho que te agradecer por me dar</h3>
+          <p class="tl-desc">Obrigado por ter passado meu aniversário comigo, meu amor. Você conseguiu de um jeito que ninguém mais consegue: me tirou do meu conforto, me fez bater meus parabéns, e olha que isso é algo que quase nunca acontece comigo direito. Cada momento com você nesse dia me fez perceber como sou sortudo de ter alguém que me entende, me desafia e ainda me faz rir até nas coisas mais simples que eu posso ter. Eu te amo demais, de um jeito que nem cabe em palavras, mas que transborda em cada lembrança que a gente cria juntos. E sério, obrigado por fazer meu dia especial... e por não me deixar virar um monge isolado no meu canto!</p>
+        </div>
+        <div class="tl-spacer"></div>
+      </div>
+
+      <div class="tl-item reveal" style="transition-delay:.3s">
+        <div class="tl-dot" style="background:linear-gradient(135deg,var(--gold),var(--pink));box-shadow:0 0 20px rgba(247,215,148,.7);width:16px;height:16px;"></div>
+        <div class="tl-spacer"></div>
+        <div class="tl-card" style="border-color:rgba(247,215,148,.2)">
+          <p class="tl-date" style="color:var(--gold)">hoje ✦ aniversário</p>
+          <h3 class="tl-title">E a história continua...</h3>
+          <p class="tl-desc">Hoje é um dia especial. Que esse seja mais um capítulo de uma história linda que ainda tem muitos mais pela frente. 🌸</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CARTA -->
+<section class="letter-section">
+  <div class="container reveal">
+    <p class="sec-label">✦ do fundo do coração ✦</p>
+    <h2 class="sec-title">Uma <em>carta</em> pra você</h2>
+    <div class="letter-card">
+      <div class="letter-body">
+        <!--EDITE SUA CARTA AQUI-->
+        <p>Jessica, <em>eu não tenho palavras</em> suficientes pra descrever o que você significa pra mim. Mas hoje, no seu aniversário, eu precisava e preciso tentar.</p>
+        <p>Você chegou na minha vida de um jeito que eu sinceramente nem esperava, e desde então tudo ficou <strong>mais colorido, muito mais leve e mais bonito.</strong> Você é daquele tipo de pessoa rara que faz a gente querer ser melhor só de estar perto. E eu sinto isso.</p>
+        <p>São <em>293 dias</em> que eu acordo todo dia com sorte, me sentido completamente sortudo. Sorte de ter você. De saber que você existe, de saber que eu te reencontrei, que você é minha, que eu sou seu.</p>
+        <p>Eu sei que não tenho muito pra te dar hoje. Mas tenho <em>tudo isso aqui,</em> que é a coisa mais sincera que eu já fiz na vida. E tenho o coração mais cheio que já tive.</p>
+        <p><strong>Feliz aniversário, meu amor.</strong> Que esse ano te traga tudo que você merece, e você merece muito, muito mais do que imagina.</p>
+      </div>
+      <p class="letter-sig">- com todo o amor que existe nessa galáxia e nas próximas, elias ✦</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-heart">🌸</div>
+  <p class="footer-text">feito com amor, em algum canto do universo &nbsp;✦&nbsp; feliz aniversário, amor!</p>
+</footer>
+
+<script>
+/* STARFIELD */
+(function(){
+  const cv=document.getElementById('starfield'),ctx=cv.getContext('2d');
+  let W,H,stars=[],shoots=[];
+  function resize(){ W=cv.width=innerWidth; H=cv.height=innerHeight; }
+  function mkStars(n){ stars=[]; for(let i=0;i<n;i++){ const b=Math.random()<.12; stars.push({x:Math.random()*W,y:Math.random()*H,r:b?Math.random()*1.4+1:Math.random()*.7+.2,a:Math.random()*.6+.2,sp:Math.random()*.018+.006,ph:Math.random()*Math.PI*2,col:Math.random()<.18?(Math.random()<.5?'#f4a0c0':'#c9a7f5'):'#fdf0f8'}); } }
+  function mkShoot(){ const sx=Math.random()*W*.7+W*.15,sy=Math.random()*H*.35,a=(Math.random()*22+18)*Math.PI/180,sp=Math.random()*12+7; shoots.push({x:sx,y:sy,dx:-Math.cos(a)*sp,dy:Math.sin(a)*sp,len:Math.random()*130+70,al:1,dec:Math.random()*.018+.012}); }
+  let lt=0;
+  function loop(t){ ctx.clearRect(0,0,W,H); stars.forEach(s=>{ const a=s.a*(.5+.5*Math.sin(s.ph+t*s.sp*.001)); ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle=s.col; ctx.globalAlpha=a; ctx.fill(); }); ctx.globalAlpha=1; shoots=shoots.filter(s=>s.al>0); shoots.forEach(s=>{ const tx=s.x-s.dx*(s.len/14),ty=s.y-s.dy*(s.len/14),g=ctx.createLinearGradient(tx,ty,s.x,s.y); g.addColorStop(0,`rgba(253,240,248,0)`); g.addColorStop(1,`rgba(253,240,248,${s.al})`); ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(s.x,s.y); ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.stroke(); s.x+=s.dx; s.y+=s.dy; s.al-=s.dec; }); if(t-lt>Math.random()*4000+1800){ mkShoot(); lt=t; } requestAnimationFrame(loop); }
+  resize(); mkStars(260); window.addEventListener('resize',()=>{ resize(); mkStars(260); }); requestAnimationFrame(loop);
+})();
+
+/* COUNTER */
+(function(){
+  const START=new Date('2025-06-12T16:53:00');
+  const pad=(n,d=2)=>String(n).padStart(d,'0');
+  function tick(){ const diff=Math.floor((new Date()-START)/1000),d=Math.floor(diff/86400),h=Math.floor((diff%86400)/3600),m=Math.floor((diff%3600)/60),s=diff%60; document.getElementById('cnt-days').textContent=pad(d,3); document.getElementById('cnt-hours').textContent=pad(h); document.getElementById('cnt-mins').textContent=pad(m); document.getElementById('cnt-secs').textContent=pad(s); }
+  tick(); setInterval(tick,1000);
+})();
+
+/* MUSIC PLAYER */
+(function(){
+  const audio=document.getElementById('bg-audio'),btn=document.getElementById('play-btn'),ipl=document.getElementById('icon-play'),ipa=document.getElementById('icon-pause'),eq=document.getElementById('eq-bars');
+  let on=false;
+  btn.addEventListener('click',()=>{ if(on){ audio.pause(); ipl.style.display=''; ipa.style.display='none'; eq.classList.add('paused'); }else{ audio.play().catch(()=>{}); ipl.style.display='none'; ipa.style.display=''; eq.classList.remove('paused'); } on=!on; });
+})();
+
+/* PARTICLE HEART */
+(function(){
+  const cv=document.getElementById('heartCanvas'),ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height,RR=65,RF=0.14,EA=0.09;
+  function heart(t,s=7.5){ return {x:s*16*Math.pow(Math.sin(t),3),y:-s*(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))}; }
+  class P { constructor(t){ this.t=t;this.off=Math.random()*1000;this.sz=1+Math.random()*2.2;this.base={x:0,y:0};this.pos={x:0,y:0};this.vel={x:0,y:0};this._b(0);this.pos.x=this.base.x;this.pos.y=this.base.y; } _b(time){ const p=1+.28*Math.sin(time*3+this.off),nt=this.t+.18*Math.sin(time*2+this.off*2),h=heart(nt); this.base.x=W/2+h.x*p; this.base.y=H/2+h.y*p; } update(time,mouse){ this._b(time); if(mouse){ const dx=this.pos.x-mouse.x,dy=this.pos.y-mouse.y,dist=Math.sqrt(dx*dx+dy*dy); if(dist<RR){ const f=(RR-dist)/RR*RF,a=Math.atan2(dy,dx); this.vel.x+=Math.cos(a)*f; this.vel.y+=Math.sin(a)*f; } } this.vel.x*=.8;this.vel.y*=.8;this.pos.x+=this.vel.x;this.pos.y+=this.vel.y;this.pos.x+=(this.base.x-this.pos.x)*EA;this.pos.y+=(this.base.y-this.pos.y)*EA; } draw(ctx){ const g=ctx.createRadialGradient(this.pos.x,this.pos.y,0,this.pos.x,this.pos.y,this.sz*4); g.addColorStop(0,'rgba(244,100,160,.95)');g.addColorStop(.5,'rgba(180,70,130,.7)');g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g;ctx.beginPath();ctx.shadowColor='rgba(244,100,160,.8)';ctx.shadowBlur=10;ctx.arc(this.pos.x,this.pos.y,this.sz,0,Math.PI*2);ctx.fill(); } }
+  const parts=[]; for(let i=0;i<160;i++) parts.push(new P(Math.random()*Math.PI*2));
+  let mouse=null;
+  cv.addEventListener('mousemove',e=>{ const r=cv.getBoundingClientRect(); mouse={x:e.clientX-r.left,y:e.clientY-r.top}; });
+  cv.addEventListener('touchmove',e=>{ const r=cv.getBoundingClientRect(); if(e.touches.length>0) mouse={x:e.touches[0].clientX-r.left,y:e.touches[0].clientY-r.top}; },{passive:true});
+  cv.addEventListener('mouseleave',()=>mouse=null);
+  cv.addEventListener('touchend',()=>mouse=null);
+  function animate(t=0){ ctx.clearRect(0,0,W,H); parts.forEach(p=>{ p.update(t/1000,mouse); p.draw(ctx); }); requestAnimationFrame(animate); }
+  animate();
+})();
+
+/* RAIN HEARTS */
+function cairCoracoes(){ const em=['💕','💗','🌸','✨','💖','💝','💓']; for(let i=0;i<70;i++) setTimeout(()=>{ const el=document.createElement('div'); el.className='heart-particle'; el.textContent=em[Math.floor(Math.random()*em.length)]; el.style.left=Math.random()*100+'vw'; el.style.top=(window.innerHeight+10)+'px'; el.style.fontSize=(Math.random()*16+10)+'px'; el.style.animationDuration=(Math.random()*2+2.5)+'s'; document.body.appendChild(el); setTimeout(()=>el.remove(),4000); },i*45); }
+
+/* SCROLL REVEAL */
+(function(){ const obs=new IntersectionObserver(entries=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } }); },{threshold:.1}); document.querySelectorAll('.reveal').forEach(el=>obs.observe(el)); })();
+</script>
+</body>
+</html>
